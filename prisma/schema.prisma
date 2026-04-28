@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum TaskStatus {
+  PENDING
+  DONE
+}
+
+enum TaskSource {
+  VOICE
+  MANUAL
+}
+
+enum TTSProvider {
+  ELEVENLABS
+  BROWSER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  numericId    Int      @unique @default(autoincrement())
+  name         String?
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  voiceProfiles VoiceProfile[]
+  tasks        Task[]
+  meetings     Meeting[]
+  config       UserConfig?
+}
+
+model VoiceProfile {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  language  String
+  createdAt DateTime @default(now())
+}
+
+model Task {
+  id          String      @id @default(cuid())
+  user        User        @relation(fields: [userId], references: [id])
+  userId      String
+  title       String
+  description String?
+  dueDate    DateTime?
+  status      TaskStatus @default(PENDING)
+  source      TaskSource @default(MANUAL)
+  createdAt   DateTime   @default(now())
+}
+
+model Meeting {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  title       String
+  participants String[]
+  date        DateTime
+  notes       String?
+  summary     String?
+  actionItems String[]
+  transcript  String?
+  createdAt   DateTime @default(now())
+}
+
+model UserConfig {
+  id          String       @id @default(cuid())
+  user        User         @relation(fields: [userId], references: [id])
+  userId      String       @unique
+  preferredVoice String?
+  language    String?
+  ttsProvider  TTSProvider @default(BROWSER)
+}
