@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "voice-assistant-app",
   "version": "0.1.0",
   "private": true,
@@ -18,8 +18,8 @@
     "next-auth": "^4.24.14",
     "openai": "^6.34.0",
     "prisma": "^5.22.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-hook-form": "^7.74.0",
     "socket.io-client": "^4.8.3",
     "zod": "^4.3.6"
