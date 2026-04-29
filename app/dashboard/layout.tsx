@@ -1,4 +1,4 @@
-﻿export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex">
       <aside className="w-56 bg-[#0d0d1a] border-r border-[#1a1a2e] flex flex-col p-5 fixed h-full">
@@ -11,15 +11,19 @@
         </div>
         <nav className="space-y-1 flex-1">
           <a href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#8888aa] hover:bg-[#1a1a2e] hover:text-white transition">
-            <span className="text-base">🏠</span>
+            <span>🏠</span>
             <span className="text-sm font-medium">Dashboard</span>
           </a>
           <a href="/dashboard/tasks" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#8888aa] hover:bg-[#1a1a2e] hover:text-white transition">
-            <span className="text-base">✅</span>
+            <span>✅</span>
             <span className="text-sm font-medium">Tasks</span>
           </a>
+          <a href="/dashboard/schedule" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#8888aa] hover:bg-[#1a1a2e] hover:text-white transition">
+            <span>🗓️</span>
+            <span className="text-sm font-medium">Schedule</span>
+          </a>
           <a href="/dashboard/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#8888aa] hover:bg-[#1a1a2e] hover:text-white transition">
-            <span className="text-base">⚙️</span>
+            <span>⚙️</span>
             <span className="text-sm font-medium">Settings</span>
           </a>
         </nav>
