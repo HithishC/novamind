@@ -22,6 +22,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span>🗓️</span>
             <span className="text-sm font-medium">Schedule</span>
           </a>
+          <a href="/dashboard/meetings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#8888aa] hover:bg-[#1a1a2e] hover:text-white transition">
+            <span>🎙️</span>
+            <span className="text-sm font-medium">Meetings</span>
+          </a>
           <a href="/dashboard/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#8888aa] hover:bg-[#1a1a2e] hover:text-white transition">
             <span>⚙️</span>
             <span className="text-sm font-medium">Settings</span>
