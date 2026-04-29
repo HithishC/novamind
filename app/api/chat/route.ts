@@ -1,60 +1,36 @@
 export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { chatWithOpenAI } from '@/lib/openai'
 import Groq from 'groq-sdk'
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || 'placeholder' })
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
 export async function POST(req: Request) {
-  const { message, model, history } = await req.json()
-
-  const messages = [
-    ...history,
-    { role: 'user', content: message }
-  ]
-
-  const systemPrompt = 'You are a helpful personal voice assistant.'
-
-  if (model === 'groq') {
-    const response = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages
-      ],
+  try {
+    const { message, history = [] } = await req.json()
+    const messages = [
+      { role: 'system', content: 'You are NovaMind, a helpful AI voice assistant. Keep responses concise and clear.' },
+      ...history,
+      { role: 'user', content: message }
+    ]
+    const stream = await groq.chat.completions.create({
+      model: 'llama3-70b-8192',
+      messages,
       stream: true,
+      max_tokens: 1024,
     })
-
-    const stream = new ReadableStream({
+    const encoder = new TextEncoder()
+    const readable = new ReadableStream({
       async start(controller) {
-        for await (const chunk of response) {
+        for await (const chunk of stream) {
           const text = chunk.choices[0]?.delta?.content || ''
-          if (text) controller.enqueue(new TextEncoder().encode(text))
+          controller.enqueue(encoder.encode(text))
         }
         controller.close()
       }
     })
-
-    return new Response(stream, {
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-    })
+    return new Response(readable, { headers: { 'Content-Type': 'text/plain' } })
+  } catch (e) {
+    console.error(e)
+    return NextResponse.json({ error: 'Chat failed' }, { status: 500 })
   }
-
-  const response = await chatWithOpenAI(messages, systemPrompt)
-
-  const stream = new ReadableStream({
-    async start(controller) {
-      for await (const chunk of response) {
-        const text = chunk.choices[0]?.delta?.content || ''
-        if (text) controller.enqueue(new TextEncoder().encode(text))
-      }
-      controller.close()
-    }
-  })
-
-  return new Response(stream, {
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-  })
 }
