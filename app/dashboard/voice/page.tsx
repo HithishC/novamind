@@ -34,7 +34,7 @@ export default function VoicePage() {
         const data = await res.json()
         if (data.text) setTranscript(data.text)
       }
-      recorder.start()
+      recorder.start(250)
       mediaRecorderRef.current = recorder
       setIsRecording(true)
       setRecordingTime(0)
@@ -92,7 +92,7 @@ export default function VoicePage() {
 
       <div style={{marginBottom:'40px'}}>
         <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:'26px',color:'#f0eeff',margin:'0 0 4px',letterSpacing:'-0.5px'}}>Voice & Schedule</h1>
-        <p style={{color:'#4a4870',fontSize:'13px',margin:0}}>Speak to create tasks or intelligently schedule your day — works on all devices</p>
+        <p style={{color:'#4a4870',fontSize:'13px',margin:0}}>Speak to create tasks or intelligently schedule your day â€” works on all devices</p>
       </div>
 
       <div style={{display:'flex',gap:'8px',marginBottom:'32px',background:'rgba(255,255,255,0.03)',borderRadius:'12px',padding:'5px',width:'fit-content',border:'1px solid rgba(255,255,255,0.06)'}}>
@@ -104,7 +104,7 @@ export default function VoicePage() {
             color:mode===m?'#c4b5fd':'#4a4870',
             boxShadow:mode===m?'inset 0 0 0 1px rgba(99,102,241,0.3)':'none'
           }}>
-            {m==='task'?'⚡ Quick Task':'🗓 Smart Schedule'}
+            {m==='task'?'âš¡ Quick Task':'ðŸ—“ Smart Schedule'}
           </button>
         ))}
       </div>
@@ -137,14 +137,14 @@ export default function VoicePage() {
                 background:isRecording?'rgba(239,68,68,0.12)':'linear-gradient(135deg,#6366f1,#8b5cf6)',
                 color:isRecording?'#f87171':'#fff',
                 boxShadow:isRecording?'inset 0 0 0 1px rgba(239,68,68,0.3)':'0 4px 24px rgba(99,102,241,0.3)'}}>
-              {isRecording?'⏹ Stop':'⬤ Record'}
+              {isRecording?'â¹ Stop':'â¬¤ Record'}
             </button>
             <button onClick={processVoice} disabled={!transcript.trim()||loading}
               style={{flex:1,padding:'12px',borderRadius:'12px',border:'none',cursor:transcript.trim()&&!loading?'pointer':'not-allowed',fontFamily:"'DM Sans',sans-serif",fontWeight:600,fontSize:'14px',transition:'all 0.2s',
                 background:transcript.trim()&&!loading?'rgba(52,211,153,0.12)':'rgba(255,255,255,0.03)',
                 color:transcript.trim()&&!loading?'#34d399':'#2a2850',
                 boxShadow:transcript.trim()&&!loading?'inset 0 0 0 1px rgba(52,211,153,0.25)':'none'}}>
-              {loading?'Processing...':mode==='task'?'✦ Save Task':'✦ Schedule'}
+              {loading?'Processing...':mode==='task'?'âœ¦ Save Task':'âœ¦ Schedule'}
             </button>
           </div>
           <button onClick={() => {setTranscript('');setTasks([]);setDone(false)}}
@@ -178,7 +178,7 @@ export default function VoicePage() {
               {task.description && <p style={{color:'#4a4870',fontSize:'13px',margin:'0 0 8px'}}>{task.description}</p>}
               {task.dueDate && (
                 <div style={{display:'inline-flex',alignItems:'center',gap:'6px',background:'rgba(99,102,241,0.1)',borderRadius:'8px',padding:'4px 10px',border:'1px solid rgba(99,102,241,0.2)'}}>
-                  <span style={{fontSize:'12px',color:'#818cf8'}}>📅 {new Date(task.dueDate).toLocaleString()}</span>
+                  <span style={{fontSize:'12px',color:'#818cf8'}}>ðŸ“… {new Date(task.dueDate).toLocaleString()}</span>
                 </div>
               )}
             </div>
