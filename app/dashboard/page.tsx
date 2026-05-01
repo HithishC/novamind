@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useRef, useEffect } from 'react'
 
 type Msg = { role: 'user'|'assistant'; content: string }
@@ -67,7 +67,7 @@ export default function Dashboard() {
       <div style={{padding:'20px 48px',borderBottom:'1px solid rgba(255,255,255,0.05)',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(8,8,26,0.8)',backdropFilter:'blur(20px)',position:'sticky',top:0,zIndex:10}}>
         <div>
           <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:'20px',color:'#f0eeff',margin:0,letterSpacing:'-0.3px'}}>AI Assistant</h1>
-          <p style={{color:'#2a2850',fontSize:'12px',margin:0,marginTop:'2px'}}>Powered by Groq · LLaMA 3 70B</p>
+          <p style={{color:'#2a2850',fontSize:'12px',margin:0,marginTop:'2px'}}>Powered by Groq Â· LLaMA 3.3 70B</p>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'8px',background:'rgba(52,211,153,0.08)',border:'1px solid rgba(52,211,153,0.2)',borderRadius:'20px',padding:'6px 14px'}}>
           <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'#34d399',boxShadow:'0 0 8px #34d399'}}></div>
@@ -110,7 +110,7 @@ export default function Dashboard() {
                   style={{display:'block',marginTop:'8px',background:'none',border:'none',cursor:'pointer',color:'#4a4870',fontSize:'11px',padding:'0',fontFamily:"'DM Sans',sans-serif",transition:'color 0.2s'}}
                   onMouseOver={e => (e.currentTarget.style.color='#818cf8')}
                   onMouseOut={e => (e.currentTarget.style.color='#4a4870')}>
-                  {isSpeaking ? '⏹ Stop' : '▶ Read aloud'}
+                  {isSpeaking ? 'â¹ Stop' : 'â–¶ Read aloud'}
                 </button>
               )}
             </div>
@@ -149,7 +149,7 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
-        <p style={{textAlign:'center',color:'#1e1c38',fontSize:'11px',margin:'10px 0 0',fontFamily:"'DM Sans',sans-serif"}}>NovaMind can make mistakes · Groq LLaMA 3 70B</p>
+        <p style={{textAlign:'center',color:'#1e1c38',fontSize:'11px',margin:'10px 0 0',fontFamily:"'DM Sans',sans-serif"}}>NovaMind can make mistakes Â· Groq LLaMA 3.3 70B</p>
       </div>
     </div>
   )

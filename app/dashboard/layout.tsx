@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 
@@ -123,7 +123,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div style={{padding:'0 20px',borderTop:'1px solid rgba(255,255,255,0.05)',paddingTop:'16px',marginTop:'16px'}}>
           <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
             <div style={{width:'7px',height:'7px',borderRadius:'50%',background:'#34d399',boxShadow:'0 0 8px #34d399aa'}}></div>
-            <span style={{fontSize:'11.5px',color:'#4a4870',fontWeight:400}}>Groq — Active</span>
+            <span style={{fontSize:'11.5px',color:'#4a4870',fontWeight:400}}>Groq â€” Active</span>
           </div>
         </div>
       </aside>
