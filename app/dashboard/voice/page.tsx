@@ -86,13 +86,14 @@ export default function VoicePage() {
         @keyframes wave{0%,100%{transform:scaleY(0.4)}50%{transform:scaleY(1)}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+        @keyframes spin{to{transform:rotate(360deg)}}
         .bar{width:3px;border-radius:99px;background:linear-gradient(to top,#6366f1,#a78bfa);transform-origin:bottom}
         .bar.active{animation:wave 1s ease-in-out infinite}
       `}</style>
 
       <div style={{marginBottom:'40px'}}>
         <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:'26px',color:'#f0eeff',margin:'0 0 4px',letterSpacing:'-0.5px'}}>Voice & Schedule</h1>
-        <p style={{color:'#4a4870',fontSize:'13px',margin:0}}>Speak to create tasks or intelligently schedule your day â€” works on all devices</p>
+        <p style={{color:'#4a4870',fontSize:'13px',margin:0}}>Speak to create tasks or schedule your day — works on all devices</p>
       </div>
 
       <div style={{display:'flex',gap:'8px',marginBottom:'32px',background:'rgba(255,255,255,0.03)',borderRadius:'12px',padding:'5px',width:'fit-content',border:'1px solid rgba(255,255,255,0.06)'}}>
@@ -104,7 +105,7 @@ export default function VoicePage() {
             color:mode===m?'#c4b5fd':'#4a4870',
             boxShadow:mode===m?'inset 0 0 0 1px rgba(99,102,241,0.3)':'none'
           }}>
-            {m==='task'?'âš¡ Quick Task':'ðŸ—“ Smart Schedule'}
+            {m==='task'?'Quick Task':'Smart Schedule'}
           </button>
         ))}
       </div>
@@ -137,16 +138,17 @@ export default function VoicePage() {
                 background:isRecording?'rgba(239,68,68,0.12)':'linear-gradient(135deg,#6366f1,#8b5cf6)',
                 color:isRecording?'#f87171':'#fff',
                 boxShadow:isRecording?'inset 0 0 0 1px rgba(239,68,68,0.3)':'0 4px 24px rgba(99,102,241,0.3)'}}>
-              {isRecording?'â¹ Stop':'â¬¤ Record'}
+              {isRecording?'Stop Recording':'Record'}
             </button>
             <button onClick={processVoice} disabled={!transcript.trim()||loading}
               style={{flex:1,padding:'12px',borderRadius:'12px',border:'none',cursor:transcript.trim()&&!loading?'pointer':'not-allowed',fontFamily:"'DM Sans',sans-serif",fontWeight:600,fontSize:'14px',transition:'all 0.2s',
                 background:transcript.trim()&&!loading?'rgba(52,211,153,0.12)':'rgba(255,255,255,0.03)',
                 color:transcript.trim()&&!loading?'#34d399':'#2a2850',
                 boxShadow:transcript.trim()&&!loading?'inset 0 0 0 1px rgba(52,211,153,0.25)':'none'}}>
-              {loading?'Processing...':mode==='task'?'âœ¦ Save Task':'âœ¦ Schedule'}
+              {loading?'Processing...':mode==='task'?'Save Task':'Schedule'}
             </button>
           </div>
+
           <button onClick={() => {setTranscript('');setTasks([]);setDone(false)}}
             style={{padding:'8px',borderRadius:'8px',border:'none',cursor:'pointer',background:'transparent',color:'#2a2850',fontSize:'12px',fontFamily:"'DM Sans',sans-serif"}}>
             Clear
@@ -156,14 +158,13 @@ export default function VoicePage() {
         <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
           {!done && !loading && (
             <div style={{flex:1,background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'32px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'12px'}}>
-              <p style={{color:'#2a2850',fontSize:'13px',textAlign:'center',margin:0,lineHeight:'1.6'}}>Results appear here<br/>after processing your voice</p>
+              <p style={{color:'#2a2850',fontSize:'13px',textAlign:'center',margin:0,lineHeight:'1.6'}}>Results appear here after processing your voice</p>
             </div>
           )}
           {loading && (
             <div style={{flex:1,background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'32px',display:'flex',alignItems:'center',justifyContent:'center'}}>
               <div style={{textAlign:'center'}}>
                 <div style={{width:'32px',height:'32px',border:'2px solid rgba(99,102,241,0.2)',borderTop:'2px solid #6366f1',borderRadius:'50%',animation:'spin 0.8s linear infinite',margin:'0 auto 12px'}}/>
-                <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
                 <p style={{color:'#4a4870',fontSize:'13px',margin:0}}>Transcribing & processing...</p>
               </div>
             </div>
@@ -178,14 +179,14 @@ export default function VoicePage() {
               {task.description && <p style={{color:'#4a4870',fontSize:'13px',margin:'0 0 8px'}}>{task.description}</p>}
               {task.dueDate && (
                 <div style={{display:'inline-flex',alignItems:'center',gap:'6px',background:'rgba(99,102,241,0.1)',borderRadius:'8px',padding:'4px 10px',border:'1px solid rgba(99,102,241,0.2)'}}>
-                  <span style={{fontSize:'12px',color:'#818cf8'}}>ðŸ“… {new Date(task.dueDate).toLocaleString()}</span>
+                  <span style={{fontSize:'12px',color:'#818cf8'}}>Due: {new Date(task.dueDate).toLocaleString()}</span>
                 </div>
               )}
             </div>
           ))}
           {done && tasks.length===0 && (
             <div style={{flex:1,background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'32px',display:'flex',alignItems:'center',justifyContent:'center'}}>
-              <p style={{color:'#2a2850',fontSize:'13px',textAlign:'center'}}>No tasks found.<br/>Try describing more clearly.</p>
+              <p style={{color:'#2a2850',fontSize:'13px',textAlign:'center'}}>No tasks found. Try describing more clearly.</p>
             </div>
           )}
         </div>
