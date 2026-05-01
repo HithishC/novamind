@@ -110,7 +110,7 @@ export default function Dashboard() {
       <div style={{padding:'20px 48px',borderBottom:'1px solid rgba(255,255,255,0.05)',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(8,8,26,0.9)',backdropFilter:'blur(20px)',position:'sticky',top:0,zIndex:10}}>
         <div>
           <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:'20px',color:'#f0eeff',margin:0}}>AI Assistant</h1>
-          <p style={{color:'#2a2850',fontSize:'12px',margin:'2px 0 0'}}>Groq · LLaMA 3.3 70B · Web Search</p>
+          <p style={{color:'#2a2850',fontSize:'12px',margin:'2px 0 0'}}>Groq Â· LLaMA 3.3 70B Â· Web Search</p>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'8px',background:'rgba(52,211,153,0.08)',border:'1px solid rgba(52,211,153,0.2)',borderRadius:'20px',padding:'6px 14px'}}>
           <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'#34d399',boxShadow:'0 0 8px #34d399'}}></div>
@@ -126,7 +126,7 @@ export default function Dashboard() {
             </div>
             <div style={{textAlign:'center'}}>
               <p style={{color:'#f0eeff',fontSize:'16px',fontWeight:500,margin:'0 0 4px',fontFamily:"'Syne',sans-serif"}}>Start a conversation</p>
-              <p style={{color:'#2a2850',fontSize:'13px',margin:0}}>Ask anything — weather, news, code, math, anything</p>
+              <p style={{color:'#2a2850',fontSize:'13px',margin:0}}>Ask anything â€” weather, news, code, math, anything</p>
             </div>
             <div style={{display:'flex',gap:'10px',flexWrap:'wrap',justifyContent:'center',marginTop:'8px'}}>
               {["What's the weather in Mysuru?","Write a Python web scraper","Explain quantum computing","Latest cricket scores"].map(s => (
@@ -162,7 +162,7 @@ export default function Dashboard() {
                   style={{marginTop:'10px',background:'none',border:'none',cursor:'pointer',color:'#2a2850',fontSize:'11px',padding:0,fontFamily:"'DM Sans',sans-serif",display:'flex',alignItems:'center',gap:'4px'}}
                   onMouseOver={e => (e.currentTarget.style.color='#818cf8')}
                   onMouseOut={e => (e.currentTarget.style.color='#2a2850')}>
-                  {isSpeaking ? '⏹ Stop' : '▶ Read aloud'}
+                  {isSpeaking ? 'â¹ Stop' : 'â–¶ Read aloud'}
                 </button>
               )}
             </div>
@@ -183,7 +183,7 @@ export default function Dashboard() {
         {isRecording && (
           <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'10px',padding:'8px 14px',background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:'10px',width:'fit-content'}}>
             <div style={{width:'8px',height:'8px',borderRadius:'50%',background:'#ef4444',animation:'pulse 1s ease infinite'}}></div>
-            <span style={{color:'#f87171',fontSize:'12px',fontFamily:"'DM Sans',sans-serif"}}>Recording {formatTime(recordingTime)} — tap stop when done</span>
+            <span style={{color:'#f87171',fontSize:'12px',fontFamily:"'DM Sans',sans-serif"}}>Recording {formatTime(recordingTime)} â€” tap stop when done</span>
           </div>
         )}
         <div style={{display:'flex',gap:'10px',alignItems:'flex-end',background:'rgba(255,255,255,0.03)',borderRadius:'16px',border:'1px solid rgba(255,255,255,0.08)',padding:'10px 10px 10px 18px'}}>
@@ -220,7 +220,7 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
-        <p style={{textAlign:'center',color:'#1a1835',fontSize:'11px',margin:'10px 0 0'}}>NovaMind · Groq LLaMA 3.3 70B · Whisper Voice</p>
+        <p style={{textAlign:'center',color:'#1a1835',fontSize:'11px',margin:'10px 0 0'}}>NovaMind Â· Groq LLaMA 3.3 70B Â· Whisper Voice</p>
       </div>
     </div>
   )
@@ -237,7 +237,6 @@ function formatMessage(text: string): string {
     .replace(/^\* (.+)$/gm, '<li>$1</li>')
     .replace(/^- (.+)$/gm, '<li>$1</li>')
     .replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>')
-    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
     .replace(/\n\n/g, '</p><p>')
     .replace(/\n/g, '<br/>')
 }
