@@ -93,7 +93,7 @@ export default function VoicePage() {
 
       <div style={{marginBottom:'40px'}}>
         <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:'26px',color:'#f0eeff',margin:'0 0 4px',letterSpacing:'-0.5px'}}>Voice & Schedule</h1>
-        <p style={{color:'#4a4870',fontSize:'13px',margin:0}}>Speak to create tasks or schedule your day — works on all devices</p>
+        <p style={{color:'#4a4870',fontSize:'13px',margin:0}}>Speak to create tasks or schedule your day</p>
       </div>
 
       <div style={{display:'flex',gap:'8px',marginBottom:'32px',background:'rgba(255,255,255,0.03)',borderRadius:'12px',padding:'5px',width:'fit-content',border:'1px solid rgba(255,255,255,0.06)'}}>
@@ -111,6 +111,7 @@ export default function VoicePage() {
       </div>
 
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'24px',maxWidth:'1000px'}}>
+        {/* Left: Recorder */}
         <div style={{background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'32px',display:'flex',flexDirection:'column',gap:'20px'}}>
           <div style={{height:'80px',display:'flex',alignItems:'center',justifyContent:'center',gap:'4px',background:'rgba(0,0,0,0.2)',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.04)'}}>
             {[...Array(24)].map((_,i) => (
@@ -126,10 +127,24 @@ export default function VoicePage() {
             </div>
           )}
 
-          <div style={{minHeight:'90px',background:'rgba(0,0,0,0.2)',borderRadius:'14px',padding:'16px',border:'1px solid rgba(255,255,255,0.04)'}}>
-            <p style={{color:transcript?'#c4c0e8':'#2a2850',fontSize:'14px',lineHeight:'1.7',margin:0,fontStyle:transcript?'normal':'italic'}}>
-              {transcript||(mode==='task'?'Say the task name...':'Describe your schedule...')}
-            </p>
+          {/* Transcript box with its own clear button */}
+          <div style={{position:'relative'}}>
+            <div style={{minHeight:'90px',background:'rgba(0,0,0,0.2)',borderRadius:'14px',padding:'16px',border:'1px solid rgba(255,255,255,0.04)',paddingRight:'40px'}}>
+              <p style={{color:transcript?'#c4c0e8':'#2a2850',fontSize:'14px',lineHeight:'1.7',margin:0,fontStyle:transcript?'normal':'italic'}}>
+                {transcript||(mode==='task'?'Say the task name...':'Describe your schedule...')}
+              </p>
+            </div>
+            {transcript && (
+              <button
+                onClick={() => setTranscript('')}
+                title="Clear transcript"
+                style={{position:'absolute',top:'10px',right:'10px',width:'22px',height:'22px',borderRadius:'50%',border:'none',cursor:'pointer',background:'rgba(255,255,255,0.08)',color:'#4a4870',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'13px',lineHeight:1,transition:'all 0.2s'}}
+                onMouseOver={e => {(e.currentTarget as HTMLElement).style.background='rgba(239,68,68,0.15)';(e.currentTarget as HTMLElement).style.color='#f87171'}}
+                onMouseOut={e => {(e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.08)';(e.currentTarget as HTMLElement).style.color='#4a4870'}}
+              >
+                x
+              </button>
+            )}
           </div>
 
           <div style={{display:'flex',gap:'10px'}}>
@@ -148,19 +163,16 @@ export default function VoicePage() {
               {loading?'Processing...':mode==='task'?'Save Task':'Schedule'}
             </button>
           </div>
-
-          <button onClick={() => {setTranscript('');setTasks([]);setDone(false)}}
-            style={{padding:'8px',borderRadius:'8px',border:'none',cursor:'pointer',background:'transparent',color:'#2a2850',fontSize:'12px',fontFamily:"'DM Sans',sans-serif"}}>
-            Clear
-          </button>
         </div>
 
+        {/* Right: Results with its own clear button */}
         <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
           {!done && !loading && (
             <div style={{flex:1,background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'32px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'12px'}}>
               <p style={{color:'#2a2850',fontSize:'13px',textAlign:'center',margin:0,lineHeight:'1.6'}}>Results appear here after processing your voice</p>
             </div>
           )}
+
           {loading && (
             <div style={{flex:1,background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'32px',display:'flex',alignItems:'center',justifyContent:'center'}}>
               <div style={{textAlign:'center'}}>
@@ -169,21 +181,36 @@ export default function VoicePage() {
               </div>
             </div>
           )}
-          {done && tasks.map((task, i) => (
-            <div key={i} style={{background:'rgba(255,255,255,0.02)',borderRadius:'16px',border:'1px solid rgba(52,211,153,0.15)',padding:'20px',animation:'fadeUp 0.4s ease'}}>
-              <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'8px'}}>
-                <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'#34d399',boxShadow:'0 0 8px #34d399'}}/>
-                <span style={{fontSize:'11px',color:'#34d399',fontWeight:600,letterSpacing:'0.08em',textTransform:'uppercase'}}>Saved</span>
+
+          {done && tasks.length > 0 && (
+            <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                <span style={{fontSize:'11px',color:'#34d399',fontWeight:600,letterSpacing:'0.08em',textTransform:'uppercase',fontFamily:"'DM Sans',sans-serif"}}>
+                  {tasks.length} task{tasks.length>1?'s':''} saved
+                </span>
+                <button
+                  onClick={() => { setTasks([]); setDone(false) }}
+                  style={{fontSize:'11px',color:'#2a2850',background:'none',border:'none',cursor:'pointer',fontFamily:"'DM Sans',sans-serif",padding:'4px 8px',borderRadius:'6px',transition:'color 0.2s'}}
+                  onMouseOver={e => (e.currentTarget.style.color='#f87171')}
+                  onMouseOut={e => (e.currentTarget.style.color='#2a2850')}
+                >
+                  Clear results
+                </button>
               </div>
-              <p style={{color:'#e2e0ff',fontSize:'15px',fontWeight:500,margin:'0 0 4px'}}>{task.title}</p>
-              {task.description && <p style={{color:'#4a4870',fontSize:'13px',margin:'0 0 8px'}}>{task.description}</p>}
-              {task.dueDate && (
-                <div style={{display:'inline-flex',alignItems:'center',gap:'6px',background:'rgba(99,102,241,0.1)',borderRadius:'8px',padding:'4px 10px',border:'1px solid rgba(99,102,241,0.2)'}}>
-                  <span style={{fontSize:'12px',color:'#818cf8'}}>Due: {new Date(task.dueDate).toLocaleString()}</span>
+              {tasks.map((task, i) => (
+                <div key={i} style={{background:'rgba(255,255,255,0.02)',borderRadius:'16px',border:'1px solid rgba(52,211,153,0.15)',padding:'20px',animation:'fadeUp 0.4s ease'}}>
+                  <p style={{color:'#e2e0ff',fontSize:'15px',fontWeight:500,margin:'0 0 4px'}}>{task.title}</p>
+                  {task.description && <p style={{color:'#4a4870',fontSize:'13px',margin:'0 0 8px'}}>{task.description}</p>}
+                  {task.dueDate && (
+                    <div style={{display:'inline-flex',alignItems:'center',gap:'6px',background:'rgba(99,102,241,0.1)',borderRadius:'8px',padding:'4px 10px',border:'1px solid rgba(99,102,241,0.2)'}}>
+                      <span style={{fontSize:'12px',color:'#818cf8'}}>Due: {new Date(task.dueDate).toLocaleString()}</span>
+                    </div>
+                  )}
                 </div>
-              )}
+              ))}
             </div>
-          ))}
+          )}
+
           {done && tasks.length===0 && (
             <div style={{flex:1,background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'32px',display:'flex',alignItems:'center',justifyContent:'center'}}>
               <p style={{color:'#2a2850',fontSize:'13px',textAlign:'center'}}>No tasks found. Try describing more clearly.</p>
