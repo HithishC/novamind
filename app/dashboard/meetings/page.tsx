@@ -21,9 +21,11 @@ export default function MeetingsPage() {
   useEffect(() => { fetchMeetings() }, [])
 
   async function fetchMeetings() {
-    const res = await fetch('/api/meetings')
-    const data = await res.json()
-    setSavedMeetings(Array.isArray(data) ? data : [])
+    try {
+      const res = await fetch('/api/meetings')
+      const data = await res.json()
+      setSavedMeetings(Array.isArray(data) ? data : [])
+    } catch {}
   }
 
   async function startRecording() {
@@ -44,10 +46,7 @@ export default function MeetingsPage() {
         setLoading(true)
         const res = await fetch('/api/transcribe', { method: 'POST', body: form })
         const data = await res.json()
-        if (data.text) {
-          setRawTranscript(data.text)
-          await summarize(data.text)
-        }
+        if (data.text) { setRawTranscript(data.text); await summarize(data.text) }
         setLoading(false)
       }
       recorder.start(250)
@@ -55,9 +54,7 @@ export default function MeetingsPage() {
       setStep('recording')
       setRecordingTime(0)
       timerRef.current = setInterval(() => setRecordingTime(t => t + 1), 1000)
-    } catch {
-      alert('Microphone access denied.')
-    }
+    } catch { alert('Microphone access denied.') }
   }
 
   function stopRecording() {
@@ -95,59 +92,61 @@ export default function MeetingsPage() {
   }
 
   function reset() {
-    setStep('setup')
-    setMeetingTitle('')
-    setAttendees('')
-    setAgenda('')
-    setRecordingTime(0)
-    setRawTranscript('')
-    setSummary('')
-    setActionItems([])
-    setSaved(false)
-    setLoading(false)
+    setStep('setup'); setMeetingTitle(''); setAttendees(''); setAgenda('')
+    setRecordingTime(0); setRawTranscript(''); setSummary(''); setActionItems([]); setSaved(false); setLoading(false)
   }
 
   function formatTime(s: number) {
     return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`
   }
 
+  const inputStyle = {
+    width:'100%',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',
+    borderRadius:'12px',padding:'12px 16px',color:'#e2e0ff',fontSize:'clamp(13px,2vw,14px)',
+    transition:'border-color 0.2s',fontFamily:"'DM Sans',sans-serif",outline:'none' as const
+  }
+
   return (
-    <div style={{minHeight:'100vh',padding:'48px 52px',background:'#05050f'}}>
+    <div style={{minHeight:'100vh',padding:'clamp(24px,5vw,48px) clamp(16px,5vw,52px)',background:'#05050f'}}>
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@700;800&display=swap');
         @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes wave{0%,100%{transform:scaleY(0.3)}50%{transform:scaleY(1)}}
-        .bar{width:3px;border-radius:99px;background:linear-gradient(to top,#6366f1,#a78bfa);transform-origin:bottom}
-        .bar.active{animation:wave 0.9s ease-in-out infinite}
+        .mbar{width:3px;border-radius:99px;background:linear-gradient(to top,#6366f1,#a78bfa);transform-origin:bottom;animation:wave 0.9s ease-in-out infinite}
         input,textarea{outline:none;font-family:'DM Sans',sans-serif}
         input::placeholder,textarea::placeholder{color:#2a2850}
+        .step-label{display:inline}
+        @media(max-width:479px){.step-label{display:none}}
       `}</style>
 
-      <div style={{maxWidth:'860px'}}>
-        <div style={{marginBottom:'40px'}}>
-          <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:'26px',color:'#f0eeff',margin:'0 0 4px',letterSpacing:'-0.5px'}}>Meeting Recorder</h1>
-          <p style={{color:'#4a4870',fontSize:'13px',margin:0}}>Fill in details, record your meeting, get an AI summary instantly</p>
+      <div style={{maxWidth:'860px',width:'100%'}}>
+
+        {/* Header */}
+        <div style={{marginBottom:'clamp(24px,4vw,40px)'}}>
+          <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:'clamp(20px,4vw,26px)',color:'#f0eeff',margin:'0 0 4px',letterSpacing:'-0.5px'}}>Meeting Recorder</h1>
+          <p style={{color:'#4a4870',fontSize:'clamp(12px,2vw,13px)',margin:0}}>Fill in details, record your meeting, get an AI summary instantly</p>
         </div>
 
         {/* Step indicators */}
-        <div style={{display:'flex',alignItems:'center',gap:'0',marginBottom:'40px'}}>
+        <div style={{display:'flex',alignItems:'center',marginBottom:'clamp(24px,4vw,40px)',overflowX:'auto',paddingBottom:'4px'}}>
           {['Setup','Recording','Summary'].map((s, i) => {
-            const stepKeys = ['setup','recording','summary']
-            const active = stepKeys[i] === step
-            const done = stepKeys.indexOf(step) > i
+            const keys = ['setup','recording','summary']
+            const active = keys[i] === step
+            const done = keys.indexOf(step) > i
             return (
-              <div key={s} style={{display:'flex',alignItems:'center'}}>
+              <div key={s} style={{display:'flex',alignItems:'center',flexShrink:0}}>
                 <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                  <div style={{width:'28px',height:'28px',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:600,fontFamily:"'DM Sans',sans-serif",
+                  <div style={{width:'clamp(24px,5vw,28px)',height:'clamp(24px,5vw,28px)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:600,flexShrink:0,
                     background:done?'#6366f1':active?'rgba(99,102,241,0.2)':'rgba(255,255,255,0.04)',
                     color:done?'#fff':active?'#818cf8':'#2a2850',
                     border:active?'1px solid rgba(99,102,241,0.4)':done?'none':'1px solid rgba(255,255,255,0.06)'}}>
                     {done?'✓':i+1}
                   </div>
-                  <span style={{fontSize:'13px',fontWeight:active?500:400,color:active?'#c4b5fd':done?'#6366f1':'#2a2850',fontFamily:"'DM Sans',sans-serif"}}>{s}</span>
+                  <span className="step-label" style={{fontSize:'clamp(12px,2vw,13px)',fontWeight:active?500:400,color:active?'#c4b5fd':done?'#6366f1':'#2a2850',whiteSpace:'nowrap'}}>{s}</span>
                 </div>
-                {i < 2 && <div style={{width:'40px',height:'1px',background:'rgba(255,255,255,0.06)',margin:'0 12px'}}/>}
+                {i < 2 && <div style={{width:'clamp(24px,4vw,40px)',height:'1px',background:'rgba(255,255,255,0.06)',margin:'0 clamp(6px,2vw,12px)',flexShrink:0}}/>}
               </div>
             )
           })}
@@ -155,37 +154,28 @@ export default function MeetingsPage() {
 
         {/* STEP 1: Setup */}
         {step === 'setup' && (
-          <div style={{animation:'fadeUp 0.4s ease',background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'32px',display:'flex',flexDirection:'column',gap:'20px',marginBottom:'40px'}}>
-            <div>
-              <label style={{display:'block',fontSize:'12px',color:'#4a4870',fontWeight:500,marginBottom:'8px',letterSpacing:'0.05em',textTransform:'uppercase'}}>Meeting Title</label>
-              <input value={meetingTitle} onChange={e => setMeetingTitle(e.target.value)}
-                placeholder="e.g. Q2 Product Review"
-                style={{width:'100%',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'12px 16px',color:'#e2e0ff',fontSize:'14px',transition:'border-color 0.2s'}}
-                onFocus={e => e.target.style.borderColor='rgba(99,102,241,0.4)'}
-                onBlur={e => e.target.style.borderColor='rgba(255,255,255,0.08)'}
-              />
-            </div>
-            <div>
-              <label style={{display:'block',fontSize:'12px',color:'#4a4870',fontWeight:500,marginBottom:'8px',letterSpacing:'0.05em',textTransform:'uppercase'}}>Attendees</label>
-              <input value={attendees} onChange={e => setAttendees(e.target.value)}
-                placeholder="e.g. Hithish, Priya, Rajan"
-                style={{width:'100%',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'12px 16px',color:'#e2e0ff',fontSize:'14px',transition:'border-color 0.2s'}}
-                onFocus={e => e.target.style.borderColor='rgba(99,102,241,0.4)'}
-                onBlur={e => e.target.style.borderColor='rgba(255,255,255,0.08)'}
-              />
-            </div>
-            <div>
-              <label style={{display:'block',fontSize:'12px',color:'#4a4870',fontWeight:500,marginBottom:'8px',letterSpacing:'0.05em',textTransform:'uppercase'}}>Agenda</label>
-              <textarea value={agenda} onChange={e => setAgenda(e.target.value)}
-                placeholder="What will be discussed?"
-                rows={3}
-                style={{width:'100%',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'12px 16px',color:'#e2e0ff',fontSize:'14px',resize:'none',lineHeight:'1.6',transition:'border-color 0.2s'}}
-                onFocus={e => e.target.style.borderColor='rgba(99,102,241,0.4)'}
-                onBlur={e => e.target.style.borderColor='rgba(255,255,255,0.08)'}
-              />
-            </div>
+          <div style={{animation:'fadeUp 0.4s ease',background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'clamp(20px,4vw,32px)',display:'flex',flexDirection:'column',gap:'18px',marginBottom:'clamp(24px,4vw,40px)'}}>
+            {[
+              {label:'Meeting Title',val:meetingTitle,set:setMeetingTitle,ph:'e.g. Q2 Product Review',type:'input'},
+              {label:'Attendees',val:attendees,set:setAttendees,ph:'e.g. Hithish, Priya, Rajan',type:'input'},
+              {label:'Agenda',val:agenda,set:setAgenda,ph:'What will be discussed?',type:'textarea'},
+            ].map(f => (
+              <div key={f.label}>
+                <label style={{display:'block',fontSize:'11px',color:'#4a4870',fontWeight:500,marginBottom:'8px',letterSpacing:'0.05em',textTransform:'uppercase'}}>{f.label}</label>
+                {f.type === 'textarea'
+                  ? <textarea value={f.val} onChange={e => f.set(e.target.value)} placeholder={f.ph} rows={3}
+                      style={{...inputStyle,resize:'none' as const,lineHeight:'1.6'}}
+                      onFocus={e=>e.target.style.borderColor='rgba(99,102,241,0.4)'}
+                      onBlur={e=>e.target.style.borderColor='rgba(255,255,255,0.08)'}/>
+                  : <input value={f.val} onChange={e => f.set(e.target.value)} placeholder={f.ph}
+                      style={inputStyle}
+                      onFocus={e=>e.target.style.borderColor='rgba(99,102,241,0.4)'}
+                      onBlur={e=>e.target.style.borderColor='rgba(255,255,255,0.08)'}/>
+                }
+              </div>
+            ))}
             <button onClick={startRecording}
-              style={{padding:'14px',borderRadius:'12px',border:'none',cursor:'pointer',background:'linear-gradient(135deg,#6366f1,#8b5cf6)',color:'#fff',fontSize:'14px',fontWeight:600,boxShadow:'0 4px 24px rgba(99,102,241,0.35)'}}>
+              style={{padding:'14px',borderRadius:'12px',border:'none',cursor:'pointer',background:'linear-gradient(135deg,#6366f1,#8b5cf6)',color:'#fff',fontSize:'clamp(13px,2vw,14px)',fontWeight:600,boxShadow:'0 4px 24px rgba(99,102,241,0.35)'}}>
               Start Recording
             </button>
           </div>
@@ -193,21 +183,21 @@ export default function MeetingsPage() {
 
         {/* STEP 2: Recording */}
         {step === 'recording' && (
-          <div style={{animation:'fadeUp 0.4s ease',background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(239,68,68,0.15)',padding:'32px',display:'flex',flexDirection:'column',gap:'24px',marginBottom:'40px'}}>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-              <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
-                <div style={{width:'10px',height:'10px',borderRadius:'50%',background:'#ef4444',boxShadow:'0 0 12px #ef4444',animation:'pulse 1s ease infinite'}}/>
-                <span style={{color:'#f87171',fontSize:'15px',fontWeight:600}}>Recording</span>
+          <div style={{animation:'fadeUp 0.4s ease',background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(239,68,68,0.15)',padding:'clamp(20px,4vw,32px)',display:'flex',flexDirection:'column',gap:'20px',marginBottom:'clamp(24px,4vw,40px)'}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:'8px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                <div style={{width:'10px',height:'10px',borderRadius:'50%',background:'#ef4444',boxShadow:'0 0 12px #ef4444',animation:'pulse 1s ease infinite',flexShrink:0}}/>
+                <span style={{color:'#f87171',fontSize:'clamp(13px,2vw,15px)',fontWeight:600}}>Recording</span>
               </div>
-              <span style={{color:'#f87171',fontSize:'20px',fontWeight:700,fontFamily:"'Syne',sans-serif"}}>{formatTime(recordingTime)}</span>
+              <span style={{color:'#f87171',fontSize:'clamp(16px,3vw,20px)',fontWeight:700,fontFamily:"'Syne',sans-serif"}}>{formatTime(recordingTime)}</span>
             </div>
-            <div style={{height:'70px',display:'flex',alignItems:'center',justifyContent:'center',gap:'4px',background:'rgba(0,0,0,0.3)',borderRadius:'14px',overflow:'hidden'}}>
+            <div style={{height:'clamp(50px,8vw,70px)',display:'flex',alignItems:'center',justifyContent:'center',gap:'3px',background:'rgba(0,0,0,0.3)',borderRadius:'14px',overflow:'hidden'}}>
               {[...Array(28)].map((_,i) => (
-                <div key={i} className="bar active" style={{height:'36px',animationDelay:`${i*0.04}s`}}/>
+                <div key={i} className="mbar" style={{height:'clamp(20px,4vw,36px)',animationDelay:`${i*0.04}s`}}/>
               ))}
             </div>
             <button onClick={stopRecording}
-              style={{padding:'14px',borderRadius:'12px',border:'none',cursor:'pointer',background:'rgba(239,68,68,0.12)',color:'#f87171',fontSize:'14px',fontWeight:600,boxShadow:'inset 0 0 0 1px rgba(239,68,68,0.3)'}}>
+              style={{padding:'14px',borderRadius:'12px',border:'none',cursor:'pointer',background:'rgba(239,68,68,0.12)',color:'#f87171',fontSize:'clamp(13px,2vw,14px)',fontWeight:600,boxShadow:'inset 0 0 0 1px rgba(239,68,68,0.3)'}}>
               Stop and Generate Summary
             </button>
           </div>
@@ -215,50 +205,50 @@ export default function MeetingsPage() {
 
         {/* STEP 3: Summary */}
         {step === 'summary' && (
-          <div style={{animation:'fadeUp 0.4s ease',display:'flex',flexDirection:'column',gap:'16px',marginBottom:'40px'}}>
+          <div style={{animation:'fadeUp 0.4s ease',display:'flex',flexDirection:'column',gap:'14px',marginBottom:'clamp(24px,4vw,40px)'}}>
             {loading && (
-              <div style={{background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'48px',display:'flex',flexDirection:'column',alignItems:'center',gap:'16px'}}>
+              <div style={{background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'clamp(32px,6vw,48px)',display:'flex',flexDirection:'column',alignItems:'center',gap:'16px'}}>
                 <div style={{width:'36px',height:'36px',border:'2px solid rgba(99,102,241,0.2)',borderTop:'2px solid #6366f1',borderRadius:'50%',animation:'spin 0.8s linear infinite'}}/>
                 <p style={{color:'#4a4870',fontSize:'14px',margin:0}}>Generating summary...</p>
               </div>
             )}
             {!loading && summary && (
               <>
-                <div style={{background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'28px'}}>
-                  <p style={{fontSize:'11px',color:'#6366f1',fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase',margin:'0 0 12px'}}>Meeting Details</p>
-                  <p style={{color:'#e2e0ff',fontSize:'16px',fontWeight:600,margin:'0 0 6px',fontFamily:"'Syne',sans-serif"}}>{meetingTitle || 'Untitled Meeting'}</p>
+                <div style={{background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'clamp(18px,3vw,28px)'}}>
+                  <p style={{fontSize:'11px',color:'#6366f1',fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase',margin:'0 0 10px'}}>Meeting Details</p>
+                  <p style={{color:'#e2e0ff',fontSize:'clamp(14px,2.5vw,16px)',fontWeight:600,margin:'0 0 6px',fontFamily:"'Syne',sans-serif"}}>{meetingTitle||'Untitled Meeting'}</p>
                   {attendees && <p style={{color:'#4a4870',fontSize:'13px',margin:'0 0 4px'}}>Attendees: {attendees}</p>}
                   {agenda && <p style={{color:'#4a4870',fontSize:'13px',margin:0}}>Agenda: {agenda}</p>}
                 </div>
-                <div style={{background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'28px'}}>
-                  <p style={{fontSize:'11px',color:'#34d399',fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase',margin:'0 0 12px'}}>AI Summary</p>
-                  <p style={{color:'#c4c0e8',fontSize:'14px',lineHeight:'1.8',margin:0}}>{summary}</p>
+                <div style={{background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'clamp(18px,3vw,28px)'}}>
+                  <p style={{fontSize:'11px',color:'#34d399',fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase',margin:'0 0 10px'}}>AI Summary</p>
+                  <p style={{color:'#c4c0e8',fontSize:'clamp(13px,2vw,14px)',lineHeight:'1.8',margin:0}}>{summary}</p>
                 </div>
                 {actionItems.length > 0 && (
-                  <div style={{background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'28px'}}>
-                    <p style={{fontSize:'11px',color:'#f59e0b',fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase',margin:'0 0 12px'}}>Action Items</p>
+                  <div style={{background:'rgba(255,255,255,0.02)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.06)',padding:'clamp(18px,3vw,28px)'}}>
+                    <p style={{fontSize:'11px',color:'#f59e0b',fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase',margin:'0 0 10px'}}>Action Items</p>
                     <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
                       {actionItems.map((item,i) => (
                         <div key={i} style={{display:'flex',gap:'10px',alignItems:'flex-start'}}>
                           <div style={{width:'20px',height:'20px',borderRadius:'6px',background:'rgba(245,158,11,0.1)',border:'1px solid rgba(245,158,11,0.2)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                             <span style={{fontSize:'10px',color:'#f59e0b',fontWeight:700}}>{i+1}</span>
                           </div>
-                          <p style={{color:'#c4c0e8',fontSize:'14px',margin:0,lineHeight:'1.6'}}>{item}</p>
+                          <p style={{color:'#c4c0e8',fontSize:'clamp(13px,2vw,14px)',margin:0,lineHeight:'1.6'}}>{item}</p>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
-                <div style={{display:'flex',gap:'12px'}}>
+                <div style={{display:'flex',gap:'12px',flexWrap:'wrap'}}>
                   <button onClick={saveMeeting} disabled={saved}
-                    style={{flex:1,padding:'14px',borderRadius:'12px',border:'none',cursor:saved?'not-allowed':'pointer',
+                    style={{flex:1,minWidth:'140px',padding:'14px',borderRadius:'12px',border:'none',cursor:saved?'not-allowed':'pointer',
                       background:saved?'rgba(52,211,153,0.08)':'linear-gradient(135deg,#6366f1,#8b5cf6)',
-                      color:saved?'#34d399':'#fff',fontSize:'14px',fontWeight:600,
+                      color:saved?'#34d399':'#fff',fontSize:'clamp(13px,2vw,14px)',fontWeight:600,
                       boxShadow:saved?'inset 0 0 0 1px rgba(52,211,153,0.2)':'0 4px 24px rgba(99,102,241,0.3)'}}>
-                    {saved ? 'Saved!' : 'Save Meeting'}
+                    {saved?'Saved!':'Save Meeting'}
                   </button>
                   <button onClick={reset}
-                    style={{flex:1,padding:'14px',borderRadius:'12px',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer',background:'transparent',color:'#4a4870',fontSize:'14px',fontWeight:600}}>
+                    style={{flex:1,minWidth:'140px',padding:'14px',borderRadius:'12px',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer',background:'transparent',color:'#4a4870',fontSize:'clamp(13px,2vw,14px)',fontWeight:600}}>
                     New Meeting
                   </button>
                 </div>
@@ -270,41 +260,43 @@ export default function MeetingsPage() {
         {/* Saved Meetings */}
         {savedMeetings.length > 0 && (
           <div>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'20px'}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'20px',flexWrap:'wrap',gap:'8px'}}>
               <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'#6366f1'}}/>
+                <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'#6366f1',flexShrink:0}}/>
                 <span style={{fontSize:'11px',color:'#6366f1',fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase'}}>Past Meetings ({savedMeetings.length})</span>
               </div>
-              <button onClick={async () => { if(confirm('Delete all meetings?')){await fetch('/api/meetings',{method:'DELETE'});fetchMeetings()} }}
+              <button onClick={async()=>{if(confirm('Delete all meetings?')){await fetch('/api/meetings',{method:'DELETE'});fetchMeetings()}}}
                 style={{fontSize:'12px',color:'#f87171',background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:'8px',padding:'6px 12px',cursor:'pointer'}}>
                 Clear All
               </button>
             </div>
-            <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
+            <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
               {savedMeetings.map(m => (
                 <div key={m.id} style={{background:'rgba(255,255,255,0.02)',borderRadius:'16px',border:'1px solid rgba(255,255,255,0.06)',overflow:'hidden'}}>
-                  <div onClick={() => setExpanded(expanded===m.id?null:m.id)}
-                    style={{padding:'20px 24px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                    <div>
-                      <p style={{color:'#e2e0ff',fontSize:'15px',fontWeight:500,margin:'0 0 4px'}}>{m.title}</p>
-                      <p style={{color:'#4a4870',fontSize:'12px',margin:0}}>{new Date(m.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})} {m.participants?.length>0 && `· ${m.participants.join(', ')}`}</p>
+                  <div onClick={()=>setExpanded(expanded===m.id?null:m.id)}
+                    style={{padding:'clamp(14px,3vw,20px) clamp(16px,3vw,24px)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'12px'}}>
+                    <div style={{minWidth:0}}>
+                      <p style={{color:'#e2e0ff',fontSize:'clamp(13px,2vw,15px)',fontWeight:500,margin:'0 0 4px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{m.title}</p>
+                      <p style={{color:'#4a4870',fontSize:'12px',margin:0}}>{new Date(m.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}{m.participants?.length>0?` · ${m.participants.join(', ')}`:''}</p>
                     </div>
-                    <span style={{color:'#4a4870',fontSize:'18px'}}>{expanded===m.id?'∧':'∨'}</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4a4870" strokeWidth="2" style={{flexShrink:0,transform:expanded===m.id?'rotate(180deg)':'rotate(0)',transition:'transform 0.2s'}}>
+                      <path d="M6 9l6 6 6-6"/>
+                    </svg>
                   </div>
                   {expanded===m.id && (
-                    <div style={{borderTop:'1px solid rgba(255,255,255,0.06)',padding:'20px 24px',display:'flex',flexDirection:'column',gap:'16px'}}>
+                    <div style={{borderTop:'1px solid rgba(255,255,255,0.06)',padding:'clamp(14px,3vw,20px) clamp(16px,3vw,24px)',display:'flex',flexDirection:'column',gap:'14px'}}>
                       {m.summary && (
                         <div>
                           <p style={{fontSize:'11px',color:'#34d399',fontWeight:600,letterSpacing:'0.08em',textTransform:'uppercase',margin:'0 0 8px'}}>Summary</p>
-                          <p style={{color:'#8888aa',fontSize:'13px',lineHeight:'1.7',margin:0}}>{m.summary}</p>
+                          <p style={{color:'#8888aa',fontSize:'clamp(12px,2vw,13px)',lineHeight:'1.7',margin:0}}>{m.summary}</p>
                         </div>
                       )}
                       {m.actionItems?.length>0 && (
                         <div>
                           <p style={{fontSize:'11px',color:'#f59e0b',fontWeight:600,letterSpacing:'0.08em',textTransform:'uppercase',margin:'0 0 8px'}}>Action Items</p>
                           <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
-                            {m.actionItems.map((item: string,i: number) => (
-                              <p key={i} style={{color:'#8888aa',fontSize:'13px',margin:0}}>· {item}</p>
+                            {m.actionItems.map((item:string,i:number) => (
+                              <p key={i} style={{color:'#8888aa',fontSize:'clamp(12px,2vw,13px)',margin:0,lineHeight:'1.6'}}>· {item}</p>
                             ))}
                           </div>
                         </div>
