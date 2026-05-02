@@ -1,7 +1,7 @@
 'use client'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const navItems = [
   { href: '/dashboard', label: 'AI Chat', icon: 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z' },
@@ -13,6 +13,26 @@ const navItems = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    function handleResize() {
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      if (mobile) setCollapsed(false)
+      if (window.innerWidth < 1024 && window.innerWidth >= 768) setCollapsed(true)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
+
+  const sidebarWidth = isMobile ? '280px' : collapsed ? '64px' : '220px'
 
   return (
     <div style={{display:'flex',minHeight:'100vh',background:'#05050f',fontFamily:"'DM Sans',system-ui,sans-serif"}}>
@@ -22,42 +42,67 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         ::-webkit-scrollbar{width:4px}
         ::-webkit-scrollbar-track{background:transparent}
         ::-webkit-scrollbar-thumb{background:#1e1e3a;border-radius:99px}
-        .nav-link{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#4a4870;text-decoration:none;font-size:13.5px;font-weight:400;border-left:2px solid transparent;transition:all 0.2s;white-space:nowrap;overflow:hidden}
+        .nav-link{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;color:#4a4870;text-decoration:none;font-size:14px;font-weight:400;border-left:2px solid transparent;transition:all 0.2s;white-space:nowrap}
         .nav-link:hover{background:rgba(255,255,255,0.04);color:#e2e0ff;border-left-color:rgba(124,111,255,0.3)}
         .nav-active{background:linear-gradient(135deg,rgba(99,82,255,0.18),rgba(139,92,246,0.08));color:#c4b8ff !important;border-left-color:#7c6fff !important;font-weight:500 !important}
-        .sidebar{transition:width 0.3s ease}
-        .toggle-btn{position:absolute;top:50%;right:-12px;transform:translateY(-50%);width:24px;height:24px;borderRadius:50%;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:100;transition:all 0.2s}
-        .toggle-btn:hover{background:#252540;border-color:rgba(99,102,241,0.4)}
-        .label-text{transition:opacity 0.2s,width 0.3s}
+        .sidebar{transition:width 0.3s ease,transform 0.3s ease}
+        .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:40;backdrop-filter:blur(2px)}
+        .hamburger{display:none}
+        @media(max-width:767px){
+          .hamburger{display:flex;position:fixed;top:16px;left:16px;z-index:60;width:40px;height:40px;border-radius:10px;background:#08081a;border:1px solid rgba(255,255,255,0.08);align-items:center;justify-content:center;cursor:pointer}
+          .main-content{padding-top:64px !important}
+        }
+        @media(min-width:768px) and (max-width:1023px){
+          .nav-label{display:none}
+        }
+        @media(min-width:1280px){
+          .sidebar{width:240px !important}
+          .main-margin{margin-left:240px !important}
+        }
       `}</style>
 
+      {/* Mobile hamburger */}
+      <button className="hamburger" onClick={() => setMobileOpen(!mobileOpen)}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" strokeWidth="2">
+          {mobileOpen
+            ? <path d="M18 6L6 18M6 6l12 12"/>
+            : <path d="M3 12h18M3 6h18M3 18h18"/>
+          }
+        </svg>
+      </button>
+
+      {/* Mobile overlay */}
+      {isMobile && mobileOpen && (
+        <div className="overlay" onClick={() => setMobileOpen(false)}/>
+      )}
+
+      {/* Sidebar */}
       <aside className="sidebar" style={{
-        width: collapsed ? '64px' : '220px',
+        width: sidebarWidth,
         background:'#08081a',
         borderRight:'1px solid rgba(255,255,255,0.06)',
         display:'flex',
         flexDirection:'column',
         position:'fixed',
         height:'100vh',
-        padding: collapsed ? '28px 8px' : '28px 12px',
+        padding: collapsed && !isMobile ? '28px 8px' : '28px 14px',
         zIndex:50,
-        overflow:'visible'
+        overflow:'visible',
+        transform: isMobile ? (mobileOpen ? 'translateX(0)' : 'translateX(-100%)') : 'translateX(0)',
       }}>
-        {/* Toggle button */}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="toggle-btn"
-          style={{position:'absolute',top:'50%',right:'-12px',transform:'translateY(-50%)',width:'24px',height:'24px',borderRadius:'50%',background:'#1a1a2e',border:'1px solid rgba(255,255,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',zIndex:100}}>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4a4870" strokeWidth="2.5">
-            {collapsed
-              ? <path d="M9 18l6-6-6-6"/>
-              : <path d="M15 18l-6-6 6-6"/>
-            }
-          </svg>
-        </button>
+
+        {/* Desktop toggle button */}
+        {!isMobile && (
+          <button onClick={() => setCollapsed(!collapsed)}
+            style={{position:'absolute',top:'50%',right:'-12px',transform:'translateY(-50%)',width:'24px',height:'24px',borderRadius:'50%',background:'#1a1a2e',border:'1px solid rgba(255,255,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',zIndex:100,transition:'all 0.2s'}}>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4a4870" strokeWidth="2.5">
+              {collapsed ? <path d="M9 18l6-6-6-6"/> : <path d="M15 18l-6-6 6-6"/>}
+            </svg>
+          </button>
+        )}
 
         {/* Logo */}
-        <div style={{padding:'0 4px 32px',overflow:'hidden'}}>
+        <div style={{padding:'0 4px 28px',overflow:'hidden'}}>
           <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
             <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:'34px',height:'34px',flexShrink:0}}>
               <defs>
@@ -79,9 +124,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <circle cx="8.5" cy="23.5" r="1.8" fill="#c4b5fd"/>
               <circle cx="8.5" cy="12.5" r="1.8" fill="#c4b5fd"/>
             </svg>
-            {!collapsed && (
-              <div style={{overflow:'hidden'}}>
-                <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:'16px',color:'#f0eeff',letterSpacing:'-0.3px',lineHeight:1,whiteSpace:'nowrap'}}>NovaMind</div>
+            {(!collapsed || isMobile) && (
+              <div>
+                <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:'16px',color:'#f0eeff',letterSpacing:'-0.3px',lineHeight:1}}>NovaMind</div>
                 <div style={{fontSize:'9px',color:'#3a3860',letterSpacing:'0.12em',fontWeight:500,marginTop:'3px',textTransform:'uppercase'}}>Neural AI</div>
               </div>
             )}
@@ -95,34 +140,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             return (
               <Link key={item.href} href={item.href}
                 className={`nav-link ${active ? 'nav-active' : ''}`}
-                title={collapsed ? item.label : ''}
-                style={{justifyContent: collapsed ? 'center' : 'flex-start', padding: collapsed ? '10px' : '10px 12px'}}>
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{flexShrink:0,opacity:active?1:0.5}}>
+                title={collapsed && !isMobile ? item.label : ''}
+                style={{justifyContent: collapsed && !isMobile ? 'center' : 'flex-start', padding: collapsed && !isMobile ? '10px' : '10px 12px'}}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{flexShrink:0,opacity:active?1:0.5}}>
                   <path d={item.icon}/>
                 </svg>
-                {!collapsed && <span style={{whiteSpace:'nowrap'}}>{item.label}</span>}
+                {(!collapsed || isMobile) && <span className="nav-label">{item.label}</span>}
               </Link>
             )
           })}
         </nav>
 
         {/* Status */}
-        {!collapsed && (
-          <div style={{borderTop:'1px solid rgba(255,255,255,0.05)',paddingTop:'16px',marginTop:'16px'}}>
-            <div style={{display:'flex',alignItems:'center',gap:'8px',padding:'8px 4px'}}>
-              <div style={{width:'7px',height:'7px',borderRadius:'50%',background:'#34d399',boxShadow:'0 0 8px #34d399aa',flexShrink:0}}></div>
-              <span style={{fontSize:'11.5px',color:'#4a4870'}}>Groq Active</span>
-            </div>
-          </div>
-        )}
-        {collapsed && (
-          <div style={{paddingTop:'16px',marginTop:'16px',display:'flex',justifyContent:'center'}}>
-            <div style={{width:'7px',height:'7px',borderRadius:'50%',background:'#34d399',boxShadow:'0 0 8px #34d399aa'}}></div>
-          </div>
-        )}
+        <div style={{borderTop:'1px solid rgba(255,255,255,0.05)',paddingTop:'16px',marginTop:'16px',display:'flex',alignItems:'center',gap:'8px',justifyContent: collapsed && !isMobile ? 'center' : 'flex-start',padding:'16px 4px 0'}}>
+          <div style={{width:'7px',height:'7px',borderRadius:'50%',background:'#34d399',boxShadow:'0 0 8px #34d399aa',flexShrink:0}}></div>
+          {(!collapsed || isMobile) && <span style={{fontSize:'11.5px',color:'#4a4870'}}>Groq Active</span>}
+        </div>
       </aside>
 
-      <main style={{flex:1,marginLeft: collapsed ? '64px' : '220px',minHeight:'100vh',overflowY:'auto',transition:'margin-left 0.3s ease'}}>
+      {/* Main */}
+      <main className="main-content main-margin" style={{
+        flex:1,
+        marginLeft: isMobile ? '0' : collapsed ? '64px' : '220px',
+        minHeight:'100vh',
+        overflowY:'auto',
+        transition:'margin-left 0.3s ease',
+        padding: isMobile ? '64px 0 0' : '0'
+      }}>
         {children}
       </main>
     </div>
