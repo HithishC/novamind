@@ -270,9 +270,15 @@ export default function MeetingsPage() {
         {/* Saved Meetings */}
         {savedMeetings.length > 0 && (
           <div>
-            <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'20px'}}>
-              <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'#6366f1'}}/>
-              <span style={{fontSize:'11px',color:'#6366f1',fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase'}}>Past Meetings ({savedMeetings.length})</span>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'20px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'#6366f1'}}/>
+                <span style={{fontSize:'11px',color:'#6366f1',fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase'}}>Past Meetings ({savedMeetings.length})</span>
+              </div>
+              <button onClick={async () => { if(confirm('Delete all meetings?')){await fetch('/api/meetings',{method:'DELETE'});fetchMeetings()} }}
+                style={{fontSize:'12px',color:'#f87171',background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:'8px',padding:'6px 12px',cursor:'pointer'}}>
+                Clear All
+              </button>
             </div>
             <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
               {savedMeetings.map(m => (

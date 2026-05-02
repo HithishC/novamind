@@ -50,3 +50,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Failed to save' }, { status: 500 })
   }
 }
+export async function DELETE() {
+  try {
+    const userId = await ensureUser()
+    await prisma.meeting.deleteMany({ where: { userId } })
+    return NextResponse.json({ success: true })
+  } catch (e) {
+    return NextResponse.json({ error: 'Failed to delete' }, { status: 500 })
+  }
+}
