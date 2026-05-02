@@ -110,7 +110,7 @@ export default function Dashboard() {
       <div style={{padding:'20px 48px',borderBottom:'1px solid rgba(255,255,255,0.05)',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(8,8,26,0.9)',backdropFilter:'blur(20px)',position:'sticky',top:0,zIndex:10}}>
         <div>
           <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:'20px',color:'#f0eeff',margin:0}}>AI Chat</h1>
-          <p style={{color:'#2a2850',fontSize:'12px',margin:'2px 0 0'}}>Groq Ã‚Â· LLaMA 3.3 70B Ã‚Â· Web Search</p>
+          <p style={{color:'#2a2850',fontSize:'12px',margin:'2px 0 0'}}>Groq - LLaMA 3.3 70B - Web Search</p>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'8px',background:'rgba(52,211,153,0.08)',border:'1px solid rgba(52,211,153,0.2)',borderRadius:'20px',padding:'6px 14px'}}>
           <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'#34d399',boxShadow:'0 0 8px #34d399'}}></div>
@@ -220,7 +220,7 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
-        <p style={{textAlign:'center',color:'#1a1835',fontSize:'11px',margin:'10px 0 0'}}>NovaMind Ã‚Â· Groq LLaMA 3.3 70B Ã‚Â· Whisper Voice</p>
+        <p style={{textAlign:'center',color:'#1a1835',fontSize:'11px',margin:'10px 0 0'}}>NovaMind Ã‚Â· Groq - LLaMA 3.3 70B - Web Search</p>
       </div>
     </div>
   )
